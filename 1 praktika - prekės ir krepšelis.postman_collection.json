@@ -1,0 +1,1100 @@
+{
+	"info": {
+		"_postman_id": "33920dd9-61d7-49d5-aba5-cfe5a8acd012",
+		"name": "1 praktika - prekės ir krepšelis",
+		"description": "# 🚀 Get started here\n\nThis template guides you through CRUD operations (GET, POST, PUT, DELETE), variables, and tests.\n\n## 🔖 **How to use this template**\n\n#### **Step 1: Send requests**\n\nRESTful APIs allow you to perform CRUD operations using the POST, GET, PUT, and DELETE HTTP methods.\n\nThis collection contains each of these [request](https://learning.postman.com/docs/sending-requests/requests/) types. Open each request and click \"Send\" to see what happens.\n\n#### **Step 2: View responses**\n\nObserve the response tab for status code (200 OK), response time, and size.\n\n#### **Step 3: Send new Body data**\n\nUpdate or add new data in \"Body\" in the POST request. Typically, Body data is also used in PUT request.\n\n```\n{\n    \"name\": \"Add your name in the body\"\n}\n\n ```\n\n#### **Step 4: Update the variable**\n\nVariables enable you to store and reuse values in Postman. We have created a [variable](https://learning.postman.com/docs/sending-requests/variables/) called `base_url` with the sample request [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me). Replace it with your API endpoint to customize this collection.\n\n#### **Step 5: Add tests in the \"Scripts\" tab**\n\nAdding tests to your requests can help you confirm that your API is working as expected. You can write test scripts in JavaScript and view the output in the \"Test Results\" tab.\n\n<img src=\"https://content.pstmn.io/fa30ea0a-373d-4545-a668-e7b283cca343/aW1hZ2UucG5n\" alt=\"\" height=\"1530\" width=\"2162\">\n\n## 💪 Pro tips\n\n- Use folders to group related requests and organize the collection.\n    \n- Add more [scripts](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/) to verify if the API works as expected and execute workflows.\n    \n\n## 💡Related templates\n\n[API testing basics](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9a37a28-055b-49cd-8c7e-97494a21eb54&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[API documentation](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9c28f47-1253-44af-a2f3-20dce4da1f18&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[Authorization methods](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=31a9a6ed-4cdf-4ced-984c-d12c9aec1c27&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45095034"
+	},
+	"item": [
+		{
+			"name": "prekės tarp 60 ir 160",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Parse the response",
+							"let jsonData = pm.response.json();",
+							"",
+							"// Filter products with price between 60 and 160",
+							"let filtered = jsonData.data.filter(product => product.price >= 60 && product.price <= 160);",
+							"",
+							"// Ensure we have at least 5 products",
+							"if (filtered.length < 5) {",
+							"    console.error(`Not enough products in price range. Found only ${filtered.length}`);",
+							"} else {",
+							"    // Shuffle the filtered products randomly",
+							"    function shuffleArray(array) {",
+							"        return array.sort(() => Math.random() - 0.5);",
+							"    }",
+							"",
+							"    let shuffled = shuffleArray(filtered);",
+							"    let selected = shuffled.slice(0, 5);",
+							"",
+							"    // Set each product ID as an environment variable: produktas1 - produktas5",
+							"    selected.forEach((product, index) => {",
+							"        let varName = `produktas${index + 1}`;",
+							"        pm.environment.set(varName, product.id);",
+							"        console.log(`${varName}: ${product.name} (ID: ${product.id}, Price: ${product.price})`);",
+							"    });",
+							"",
+							"    console.log(\"✅ 5 products saved as environment variables (produktas1 to produktas5).\");",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{host}}/products?between=price,60,160&page=0",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "between",
+							"value": "price,60,160"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						}
+					]
+				},
+				"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+			},
+			"response": []
+		},
+		{
+			"name": "created cart",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"let jsonData = pm.response.json();",
+							"",
+							"if (jsonData.id) {",
+							"    pm.environment.set(\"cart_id\", jsonData.id);",
+							"    console.log(\"🛒 Cart ID set:\", jsonData.id);",
+							"} else {",
+							"    console.error(\"❌ No cart ID found in response.\");",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json;charset=UTF-8 ",
+						"type": "text"
+					},
+					{
+						"key": "Cookie",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"product_id\": \"01JW944D7ZZ8GJC550PPH5VW6V\",\n  \"quantity\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/carts",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts"
+					]
+				},
+				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "added 1st item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful POST request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Bearer",
+						"value": "d2abc579-fd60-4ff3-919d-31ed163ebafb",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "  {\n    \"product_id\": \"{{produktas1}}\",\n    \"quantity\": 1\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}"
+					]
+				},
+				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "Get cart info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();",
+							"let items = response.cart_items;",
+							" ",
+							"if (items && items.length > 0) {",
+							"    let lastItem = items[items.length - 1];",
+							"    let productId = lastItem.product_id;",
+							"    let productName = lastItem.product.name;",
+							"    let Quantity = lastItem.quantity;",
+							" ",
+							"    // Atvaizduok rezultatus Postman'e (testų skiltyje)",
+							"    pm.test(`📦 Paskutinės prekės Pavadinimas: ${productName}`, function () {",
+							"        pm.expect(productName).to.be.a('string'); // Dummy test",
+							"    });",
+							"    pm.test(`🛒 Paskutinės prekės ID: ${productId}`, function () {",
+							"        pm.expect(productId).to.be.a('string'); // Dummy test, kad atvaizduotų kaip \"PASSED\"",
+							"    });",
+							"    pm.test(`🛒 Paskutinės prekės Kiekis: ${Quantity}`, function () {",
+							"        pm.expect(Quantity).to.be.a('number'); // Dummy test, kad atvaizduotų kaip \"PASSED\"",
+							"    });",
+							"} else {",
+							"    pm.test(\"❌ Krepšelis tuščias\", function () {",
+							"       ",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "added 2nd item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful POST request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Bearer",
+						"value": "d2abc579-fd60-4ff3-919d-31ed163ebafb",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "  {\n    \"product_id\": \"{{produktas2}}\",\n    \"quantity\": 1\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}"
+					]
+				},
+				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "Get cart info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();",
+							"let items = response.cart_items;",
+							" ",
+							"if (items && items.length > 0) {",
+							"    let lastItem = items[items.length - 1];",
+							"    let productId = lastItem.product_id;",
+							"    let productName = lastItem.product.name;",
+							"    let Quantity = lastItem.quantity;",
+							" ",
+							"    // Atvaizduok rezultatus Postman'e (testų skiltyje)",
+							"    pm.test(`📦 Paskutinės prekės Pavadinimas: ${productName}`, function () {",
+							"        pm.expect(productName).to.be.a('string'); // Dummy test",
+							"    });",
+							"    pm.test(`🛒 Paskutinės prekės ID: ${productId}`, function () {",
+							"        pm.expect(productId).to.be.a('string'); // Dummy test, kad atvaizduotų kaip \"PASSED\"",
+							"    });",
+							"    pm.test(`🛒 Paskutinės prekės Kiekis: ${Quantity}`, function () {",
+							"        pm.expect(Quantity).to.be.a('number'); // Dummy test, kad atvaizduotų kaip \"PASSED\"",
+							"    });",
+							"} else {",
+							"    pm.test(\"❌ Krepšelis tuščias\", function () {",
+							"       ",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "added 3rd item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful POST request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Bearer",
+						"value": "d2abc579-fd60-4ff3-919d-31ed163ebafb",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "  {\n    \"product_id\": \"{{produktas3}}\",\n    \"quantity\": 1\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}"
+					]
+				},
+				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "Get cart info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();",
+							"let items = response.cart_items;",
+							" ",
+							"if (items && items.length > 0) {",
+							"    let lastItem = items[items.length - 1];",
+							"    let productId = lastItem.product_id;",
+							"    let productName = lastItem.product.name;",
+							"    let Quantity = lastItem.quantity;",
+							" ",
+							"    // Atvaizduok rezultatus Postman'e (testų skiltyje)",
+							"    pm.test(`📦 Paskutinės prekės Pavadinimas: ${productName}`, function () {",
+							"        pm.expect(productName).to.be.a('string'); // Dummy test",
+							"    });",
+							"    pm.test(`🛒 Paskutinės prekės ID: ${productId}`, function () {",
+							"        pm.expect(productId).to.be.a('string'); // Dummy test, kad atvaizduotų kaip \"PASSED\"",
+							"    });",
+							"    pm.test(`🛒 Paskutinės prekės Kiekis: ${Quantity}`, function () {",
+							"        pm.expect(Quantity).to.be.a('number'); // Dummy test, kad atvaizduotų kaip \"PASSED\"",
+							"    });",
+							"} else {",
+							"    pm.test(\"❌ Krepšelis tuščias\", function () {",
+							"       ",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3rd item changed quantity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful POST request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Bearer",
+						"value": "d2abc579-fd60-4ff3-919d-31ed163ebafb",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "  {\n    \"product_id\": \"{{produktas3}}\",\n    \"quantity\": 3\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}/product/quantity",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}",
+						"product",
+						"quantity"
+					]
+				},
+				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "Get cart info",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "let response = pm.response.json();\nlet items = response.cart_items;\n \nif (items && items.length > 0) {\n    let lastItem = items[items.length - 1];\n    let productId = lastItem.product_id;\n    let productName = lastItem.product.name;\n    let Quantity = lastItem.quantity;\n \n    // Atvaizduok rezultatus Postman'e (testų skiltyje)\n    pm.test(`📦 Paskutinės prekės Pavadinimas: ${productName}`, function () {\n        pm.expect(productName).to.be.a('string'); // Dummy test\n    });\n    pm.test(`🛒 Paskutinės prekės ID: ${productId}`, function () {\n        pm.expect(productId).to.be.a('string'); // Dummy test, kad atvaizduotų kaip \"PASSED\"\n    });\n    pm.test(`🛒 Paskutinės prekės Kiekis: ${Quantity}`, function () {\n        pm.expect(Quantity).to.be.a('number'); // Dummy test, kad atvaizduotų kaip \"PASSED\"\n    });\n} else {\n    pm.test(\"❌ Krepšelis tuščias\", function () {\n       \n    });\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "added 4th item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful POST request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Bearer",
+						"value": "d2abc579-fd60-4ff3-919d-31ed163ebafb",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "  {\n    \"product_id\": \"{{produktas4}}\",\n    \"quantity\": 1\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}"
+					]
+				},
+				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "Get cart info",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "let response = pm.response.json();\nlet items = response.cart_items;\n \nif (items && items.length > 0) {\n    let lastItem = items[items.length - 1];\n    let productId = lastItem.product_id;\n    let productName = lastItem.product.name;\n    let Quantity = lastItem.quantity;\n \n    // Atvaizduok rezultatus Postman'e (testų skiltyje)\n    pm.test(`📦 Paskutinės prekės Pavadinimas: ${productName}`, function () {\n        pm.expect(productName).to.be.a('string'); // Dummy test\n    });\n    pm.test(`🛒 Paskutinės prekės ID: ${productId}`, function () {\n        pm.expect(productId).to.be.a('string'); // Dummy test, kad atvaizduotų kaip \"PASSED\"\n    });\n    pm.test(`🛒 Paskutinės prekės Kiekis: ${Quantity}`, function () {\n        pm.expect(Quantity).to.be.a('number'); // Dummy test, kad atvaizduotų kaip \"PASSED\"\n    });\n} else {\n    pm.test(\"❌ Krepšelis tuščias\", function () {\n       \n    });\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "added 5th item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful POST request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Bearer",
+						"value": "d2abc579-fd60-4ff3-919d-31ed163ebafb",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "  {\n    \"product_id\": \"{{produktas5}}\",\n    \"quantity\": 1\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}"
+					]
+				},
+				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "Get cart info",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "let response = pm.response.json();\nlet items = response.cart_items;\n \nif (items && items.length > 0) {\n    let lastItem = items[items.length - 1];\n    let productId = lastItem.product_id;\n    let productName = lastItem.product.name;\n    let Quantity = lastItem.quantity;\n \n    // Atvaizduok rezultatus Postman'e (testų skiltyje)\n    pm.test(`📦 Paskutinės prekės Pavadinimas: ${productName}`, function () {\n        pm.expect(productName).to.be.a('string'); // Dummy test\n    });\n    pm.test(`🛒 Paskutinės prekės ID: ${productId}`, function () {\n        pm.expect(productId).to.be.a('string'); // Dummy test, kad atvaizduotų kaip \"PASSED\"\n    });\n    pm.test(`🛒 Paskutinės prekės Kiekis: ${Quantity}`, function () {\n        pm.expect(Quantity).to.be.a('number'); // Dummy test, kad atvaizduotų kaip \"PASSED\"\n    });\n} else {\n    pm.test(\"❌ Krepšelis tuščias\", function () {\n       \n    });\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete 1st item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful DELETE request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}/product/{{produktas1}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}",
+						"product",
+						"{{produktas1}}"
+					]
+				},
+				"description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "delete 2nd item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful DELETE request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}/product/{{produktas2}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}",
+						"product",
+						"{{produktas2}}"
+					]
+				},
+				"description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "delete 3rd item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful DELETE request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}/product/{{produktas3}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}",
+						"product",
+						"{{produktas3}}"
+					]
+				},
+				"description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "delete 4th item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful DELETE request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}/product/{{produktas4}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}",
+						"product",
+						"{{produktas4}}"
+					]
+				},
+				"description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "delete 5th item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful DELETE request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}/product/{{produktas5}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}",
+						"product",
+						"{{produktas5}}"
+					]
+				},
+				"description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "Get cart info",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "let response = pm.response.json();\nlet items = response.cart_items;\n \nif (items && items.length > 0) {\n    let lastItem = items[items.length - 1];\n    let productId = lastItem.product_id;\n    let productName = lastItem.product.name;\n    let Quantity = lastItem.quantity;\n \n    // Atvaizduok rezultatus Postman'e (testų skiltyje)\n    pm.test(`📦 Paskutinės prekės Pavadinimas: ${productName}`, function () {\n        pm.expect(productName).to.be.a('string'); // Dummy test\n    });\n    pm.test(`🛒 Paskutinės prekės ID: ${productId}`, function () {\n        pm.expect(productId).to.be.a('string'); // Dummy test, kad atvaizduotų kaip \"PASSED\"\n    });\n    pm.test(`🛒 Paskutinės prekės Kiekis: ${Quantity}`, function () {\n        pm.expect(Quantity).to.be.a('number'); // Dummy test, kad atvaizduotų kaip \"PASSED\"\n    });\n} else {\n    pm.test(\"❌ Krepšelis tuščias\", function () {\n       \n    });\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/carts/{{cart_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": "1"
+		},
+		{
+			"key": "base_url",
+			"value": "https://postman-rest-api-learner.glitch.me/"
+		},
+		{
+			"key": "host",
+			"value": "https://api.practicesoftwaretesting.com",
+			"type": "default"
+		},
+		{
+			"key": "total",
+			"value": ""
+		},
+		{
+			"key": "preke1",
+			"value": "01JW9B04NST4W0AN0QXWCYJSCA",
+			"type": "default"
+		},
+		{
+			"key": "preke2",
+			"value": "01JW9B04NKB6QF3MS9VA8D4VR7",
+			"type": "default"
+		},
+		{
+			"key": "preke3",
+			"value": "01JW9B04NM714BWHEB7VJYESBP",
+			"type": "default"
+		},
+		{
+			"key": "preke4",
+			"value": "01JW9B04NB33N4DMHJWAGNBNG5",
+			"type": "default"
+		},
+		{
+			"key": "preke5",
+			"value": "01JW9B04NAMWGJ46HTT8F8V04W",
+			"type": "default"
+		}
+	]
+}

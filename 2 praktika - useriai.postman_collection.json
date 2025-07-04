@@ -1,0 +1,517 @@
+{
+	"info": {
+		"_postman_id": "7339a32d-df9e-4df7-926d-d029c1d533cc",
+		"name": "2 praktika - useriai",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45095034"
+	},
+	"item": [
+		{
+			"name": "reg reqs",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/users/register",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user creation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.practicesoftwaretesting.com/users/register",
+					"protocol": "https",
+					"host": [
+						"api",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"users",
+						"register"
+					]
+				},
+				"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+			},
+			"response": []
+		},
+		{
+			"name": "lock/block account",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Function to generate a random invalid password",
+							"function generateInvalidPassword(length) {",
+							"  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';",
+							"  let password = '';",
+							"  for (let i = 0; i < length; i++) {",
+							"    password += chars.charAt(Math.floor(Math.random() * chars.length));",
+							"  }",
+							"  return password;",
+							"}",
+							"",
+							"// Set the invalid password as an environment variable",
+							"pm.environment.set(\"invalid_password\", generateInvalidPassword(12));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const status = pm.response.code;",
+							"const body = pm.response.json();",
+							"",
+							"console.log(`Attempted login with password: ${pm.environment.get(\"invalid_password\")}`);",
+							"console.log(`Status: ${status}`);",
+							"console.log(`Response: ${JSON.stringify(body)}`);",
+							"",
+							"pm.test(\"Login failed as expected\", () => {",
+							"    pm.expect(status).to.eql(401);",
+							"});",
+							"",
+							"// Watch for potential lockout or rate limit messages",
+							"if (status === 403 || status === 423) {",
+							"    pm.test(\"🚫 Account may be locked or rate limited\", () => true);",
+							"    console.warn(\"Account locked or rate limited:\", body);",
+							"}",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2FwaS5wcmFjdGljZXNvZnR3YXJldGVzdGluZy5jb20vdXNlcnMvbG9naW4iLCJpYXQiOjE3NDg1MzY0MDAsImV4cCI6MTc0ODUzNjcwMCwibmJmIjoxNzQ4NTM2NDAwLCJqdGkiOiJVRXFCRzN2NDhjUXVDam1jIiwic3ViIjoiMDFqd2VlN2FicXM5NzJqeGI1djdrdzl5eHEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3Iiwicm9sZSI6InVzZXIifQ.7-8C1xbw2vIDVHGInOs9GVfrybqx9byVOVE66cWqNZk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{invalid_password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/login",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ban user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"enabled\": false,\n  \"failed_login_attempts\": 0\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/{{user_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"{{user_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let json;",
+							"",
+							"try {",
+							"    json = pm.response.json();",
+							"} catch (e) {",
+							"    console.error(\"❌ Failed to parse JSON:\", e);",
+							"    return;",
+							"}",
+							"",
+							"console.log(\"Full response body:\", json);",
+							"",
+							"// Save the access token from \"access_token\" key",
+							"if (json.access_token) {",
+							"    // Save the token to environment variable",
+							"    pm.environment.set(\"auth_token\", json.access_token);",
+							"    ",
+							"    // Log and display the saved token in the console",
+							"    console.log(\"✅ Access token saved:\", json.access_token);",
+							"    ",
+							"    // Add a test to confirm the token is set",
+							"    pm.test(\"Access token is saved as environment variable\", function() {",
+							"        pm.expect(pm.environment.get(\"auth_token\")).to.eql(json.access_token);",
+							"    });",
+							"    ",
+							"    // Display the saved access token in Test Results (using assertion message)",
+							"    pm.test(\"Access token saved and displayed\", function() {",
+							"        pm.expect(pm.environment.get(\"auth_token\")).to.be.ok;",
+							"        pm.expect(pm.environment.get(\"auth_token\")).to.eql(json.access_token);",
+							"        pm.test(\"Access token is: \" + pm.environment.get(\"auth_token\"));  // This will show in the Test Results",
+							"    });",
+							"",
+							"} else {",
+							"    console.warn(\"⚠️ No access token found in response.\");",
+							"    ",
+							"    // Add a test to notify if the token is not found",
+							"    pm.test(\"No access token in response\", function() {",
+							"        pm.expect(json.access_token).to.be.ok;",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2FwaS5wcmFjdGljZXNvZnR3YXJldGVzdGluZy5jb20vdXNlcnMvbG9naW4iLCJpYXQiOjE3NDg1MzY0MDAsImV4cCI6MTc0ODUzNjcwMCwibmJmIjoxNzQ4NTM2NDAwLCJqdGkiOiJVRXFCRzN2NDhjUXVDam1jIiwic3ViIjoiMDFqd2VlN2FicXM5NzJqeGI1djdrdzl5eHEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3Iiwicm9sZSI6InVzZXIifQ.7-8C1xbw2vIDVHGInOs9GVfrybqx9byVOVE66cWqNZk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{user_password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/login",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get user info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/{{user_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"{{user_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete account",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/{{user_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"{{user_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

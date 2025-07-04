@@ -1,0 +1,451 @@
+{
+	"info": {
+		"_postman_id": "2c2c2559-9ba7-41a9-91ea-2944af81cf77",
+		"name": "6 praktika - invoices",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45095034"
+	},
+	"item": [
+		{
+			"name": "login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let json;",
+							"",
+							"try {",
+							"    json = pm.response.json();",
+							"} catch (e) {",
+							"    console.error(\"❌ Failed to parse JSON:\", e);",
+							"    return;",
+							"}",
+							"",
+							"console.log(\"Full response body:\", json);",
+							"",
+							"if (json.access_token) {",
+							"    // Save token to environment variable",
+							"    pm.environment.set(\"auth_token\", json.access_token);",
+							"    console.log(\"✅ Access token saved:\", json.access_token);",
+							"",
+							"    // Standard test for saving",
+							"    pm.test(\"✅ Access token is saved as environment variable\", function () {",
+							"        pm.expect(pm.environment.get(\"auth_token\")).to.eql(json.access_token);",
+							"    });",
+							"",
+							"    // Inject the token into the test name for visibility in the Test Results",
+							"    const tokenSnippet = json.access_token.substring(0, 50) + \"...\"; // avoid printing full token",
+							"    pm.test(\"🔐 Access token starts with: \" + tokenSnippet, function () {",
+							"        pm.expect(true).to.be.true;",
+							"    });",
+							"",
+							"} else {",
+							"    console.warn(\"⚠️ No access token found in response.\");",
+							"    pm.test(\"❌ No access token in response\", function () {",
+							"        pm.expect(json.access_token).to.be.ok;",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2FwaS5wcmFjdGljZXNvZnR3YXJldGVzdGluZy5jb20vdXNlcnMvbG9naW4iLCJpYXQiOjE3NDg1MzY0MDAsImV4cCI6MTc0ODUzNjcwMCwibmJmIjoxNzQ4NTM2NDAwLCJqdGkiOiJVRXFCRzN2NDhjUXVDam1jIiwic3ViIjoiMDFqd2VlN2FicXM5NzJqeGI1djdrdzl5eHEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3Iiwicm9sZSI6InVzZXIifQ.7-8C1xbw2vIDVHGInOs9GVfrybqx9byVOVE66cWqNZk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{user_password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/login",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "current invoices",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/invoices",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"invoices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create cart",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"let jsonData = pm.response.json();",
+							"",
+							"if (jsonData.id) {",
+							"    pm.environment.set(\"cart_id\", jsonData.id);",
+							"    console.log(\"🛒 Cart ID set:\", jsonData.id);",
+							"} else {",
+							"    console.error(\"❌ No cart ID found in response.\");",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json;charset=UTF-8 ",
+						"type": "text"
+					},
+					{
+						"key": "Cookie",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"product_id\": \"01JW944D7ZZ8GJC550PPH5VW6V\",\n  \"quantity\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/carts",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"carts"
+					]
+				},
+				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "create invoice",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function randomFromArray(arr) {",
+							"    return arr[Math.floor(Math.random() * arr.length)];",
+							"}",
+							"",
+							"// Choose a valid payment method",
+							"const paymentMethod = randomFromArray([",
+							"    \"cash-on-delivery\",",
+							"    \"bank-transfer\",",
+							"    \"credit-card\",",
+							"    \"buy-now-pay-later\",",
+							"    \"gift-card\"",
+							"]);",
+							"",
+							"let paymentDetails = {};",
+							"",
+							"switch (paymentMethod) {",
+							"    case \"bank-transfer\":",
+							"        paymentDetails = {",
+							"            bank_name: \"Test National Bank\",",
+							"            account_name: \"Test User\",",
+							"            account_number: Math.floor(100000000 + Math.random() * 900000000).toString()",
+							"        };",
+							"        break;",
+							"    case \"credit-card\":",
+							"        paymentDetails = {",
+							"            credit_card_number: \"4000-1234-5678-9010\",",
+							"            expiration_date: \"12/2029\",",
+							"            cvv: \"321\",",
+							"            cardholder_name: \"Jane Doe\"",
+							"        };",
+							"        break;",
+							"    case \"buy-now-pay-later\":",
+							"        paymentDetails = {",
+							"            monthly_installments: \"6\"",
+							"        };",
+							"        break;",
+							"    case \"gift-card\":",
+							"        paymentDetails = {",
+							"            gift_card_number: Math.floor(100000 + Math.random() * 900000).toString(),",
+							"            validation_code: Math.floor(100000 + Math.random() * 900000).toString()",
+							"        };",
+							"        break;",
+							"    case \"cash-on-delivery\":",
+							"    default:",
+							"        paymentDetails = {};",
+							"}",
+							"",
+							"// Random billing address",
+							"const street = `${Math.floor(Math.random() * 999)} Example St`;",
+							"const city = randomFromArray([\"New York\", \"Berlin\", \"Tokyo\", \"London\"]);",
+							"const country = randomFromArray([\"USA\", \"Germany\", \"Japan\", \"UK\"]);",
+							"",
+							"// Use existing cart ID or fallback",
+							"const cartId = pm.environment.get(\"cart_id\") || \"dummy_cart_123\";",
+							"",
+							"// Save all to environment",
+							"pm.environment.set(\"payment_method\", paymentMethod);",
+							"pm.environment.set(\"payment_details\", JSON.stringify(paymentDetails));",
+							"pm.environment.set(\"billing_street\", street);",
+							"pm.environment.set(\"billing_city\", city);",
+							"pm.environment.set(\"billing_country\", country);",
+							"pm.environment.set(\"cart_id\", cartId);",
+							"",
+							"// Logging for visibility",
+							"console.log(\"🧾 Payment Method:\", paymentMethod);",
+							"console.log(\"💳 Payment Details:\", paymentDetails);",
+							"console.log(\"🏡 Billing Address:\", { street, city, country });",
+							"console.log(\"🛒 Cart ID:\", cartId);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let json;",
+							"",
+							"try {",
+							"    json = pm.response.json();",
+							"    console.log(\"📄 Full invoice response:\", json);",
+							"} catch (e) {",
+							"    console.error(\"❌ Failed to parse JSON:\", e);",
+							"    return;",
+							"}",
+							"",
+							"// Check for invoice ID and store it",
+							"if (json && json.id) {",
+							"    pm.environment.set(\"invoice_id\", json.id);",
+							"",
+							"    pm.test(\"✅ Invoice ID saved as variable\", function () {",
+							"        pm.expect(json.id).to.be.a(\"string\");",
+							"        console.log(\"🧾 Saved Invoice ID:\", json.id);",
+							"    });",
+							"",
+							"    pm.test(\"🧾 Invoice ID: \" + json.id, function () {",
+							"        pm.expect(json.id).to.not.be.undefined;",
+							"    });",
+							"",
+							"} else {",
+							"    pm.test(\"❌ Invoice creation failed\", function () {",
+							"        pm.expect(json.id, \"Missing invoice_id\").to.not.be.undefined;",
+							"    });",
+							"}",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"payment_method\": \"{{payment_method}}\",\n  \"payment_details\": {{payment_details}},\n  \"billing_street\": \"{{billing_street}}\",\n  \"billing_city\": \"{{billing_city}}\",\n  \"billing_country\": \"{{billing_country}}\",\n  \"cart_id\": \"{{cart_id}}\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/invoices",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"invoices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "change invoice details",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"billing_street\": \"456 Maple Ave\",\n  \"billing_city\": \"London\",\n  \"billing_state\": \"MD\",\n  \"billing_country\": \"UK\",\n  \"billing_postal_code\": \"10115\"\n  }\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/invoices/{{invoice_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"invoices",
+						"{{invoice_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
