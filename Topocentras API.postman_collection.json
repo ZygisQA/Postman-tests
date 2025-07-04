@@ -1,0 +1,1788 @@
+{
+	"info": {
+		"_postman_id": "bc51b398-0425-4fab-8533-b845d165f690",
+		"name": "Topocentras API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45095034"
+	},
+	"item": [
+		{
+			"name": "Pirma užduotis",
+			"item": [
+				{
+					"name": "registracija",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Sėkminga registracija\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.firstname).to.eql(\"null\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customer\": {\n        \"email\": \"rewipob620@adrewire.com\",\n        \"extension_attributes\": {\n            \"topo_club_customer_agreement\": false\n        },\n        \"custom_attributes\": [\n            {\n                \"attribute_code\": \"opt_in_profiling\",\n                \"value\": \"1\"\n            },\n            {\n                \"attribute_code\": \"opt_in_sms\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"opt_in_email\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"topo_club_consent_prompted\",\n                \"value\": \"1\"\n            }\n        ]\n    },\n    \"password\": \"APITestavimas01\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/customers",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Sėkmingas prisijungimas\", function () {",
+									"    var responseBody = pm.response.text();",
+									"    pm.expect(responseBody).to.not.be.empty;",
+									"});",
+									"let responseBody = pm.response.text();",
+									"let cleanedToken = responseBody.replace(/^\"|\"$/g, '');",
+									"pm.collectionVariables.set(\"authorization\", cleanedToken);",
+									"console.log(\"Išsaugotas token'as:\", cleanedToken);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"rewipob620@adrewire.com\",\n    \"password\": \"APITestavimas01\",\n    \"recaptchaToken\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/integration/customer/token",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"integration",
+								"customer",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "profile info",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/customers/me",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"customers",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "change profile info",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Vardas pakeistas!\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.firstname).to.be.a('string');",
+									"    console.log(\"Vardas pakeistas į:\", jsonData.firstname);",
+									"});",
+									"pm.test(\"Pavardė pakeista!\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.lastname).to.be.a('string');",
+									"    console.log(\"Pavardė pakeista į:\", jsonData.lastname);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customer\": {\n        \"email\": \"rewipob620@adrewire.com\",\n        \"firstname\": \"Apis\",\n        \"lastname\": \"Apauskas\",\n        \"dob\": \"\",\n        \"website_id\": 1,\n        \"group_id\": 1,\n        \"custom_attributes\": [\n            {\n                \"attribute_code\": \"sforce_disable_sync\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"opt_in_email\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"opt_in_sms\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"opt_in_profiling\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"topo_club_customer_agreement\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"topo_club_consent_prompted\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"prohibit_custom_proposal_price\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"opt_in_email_changed_at\",\n                \"value\": \"2025-06-10 15:16:56\"\n            },\n            {\n                \"attribute_code\": \"opt_in_sms_changed_at\",\n                \"value\": \"2025-06-10 15:16:56\"\n            },\n            {\n                \"attribute_code\": \"opt_in_profiling_changed_at\",\n                \"value\": \"2025-06-10 15:16:56\"\n            },\n            {\n                \"attribute_code\": \"topo_club_customer_changed_at\",\n                \"value\": \"2025-06-10 15:16:56\"\n            },\n            {\n                \"attribute_code\": \"role\",\n                \"value\": \"client\"\n            },\n            {\n                \"attribute_code\": \"telephone\",\n                \"value\": \"\"\n            }\n        ]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/customers/me",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"customers",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "My cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"// Parse the response body as JSON",
+									"let cartItems = pm.response.json();",
+									"",
+									"// Test: Ensure the cart is not empty",
+									"pm.test(\"Cart is not empty\", function () {",
+									"    pm.expect(cartItems.length).to.be.above(0);",
+									"});",
+									"",
+									"// Loop through items and show detailed info in test result names",
+									"cartItems.forEach(function(item, index) {",
+									"    const testTitle = `🛒 Item #${index + 1} → 🆔 ID: ${item.item_id} | 📦 Name: ${item.name} | 🔢 Qty: ${item.qty} | 💰 Price: ${item.price}`;",
+									"",
+									"    pm.test(testTitle, function () {",
+									"        pm.expect(item.name).to.be.a('string');",
+									"        pm.expect(item.item_id).to.be.a('number');",
+									"        pm.expect(item.qty).to.be.a('number');",
+									"        pm.expect(item.price).to.be.a('number');",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/carts/mine/items",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"carts",
+								"mine",
+								"items"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Antra užduotis",
+			"item": [
+				{
+					"name": "registracija su variables",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Sėkminga registracija\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.firstname).to.eql(\"null\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let requestBody = pm.request.body.raw;",
+									"let jsonData = JSON.parse(requestBody);",
+									"",
+									"// Access nested email and top-level password",
+									"let email = jsonData.customer.email;",
+									"let password = jsonData.password;",
+									"",
+									"// Set collection variables",
+									"pm.collectionVariables.set(\"emailas\", email);",
+									"pm.collectionVariables.set(\"passwordas\", password);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customer\": {\n        \"email\": \"mitiwad439@gotemv.com\", \n        \"extension_attributes\": {\n            \"topo_club_customer_agreement\": false\n        },\n        \"custom_attributes\": [\n            {\n                \"attribute_code\": \"opt_in_profiling\",\n                \"value\": \"1\"\n            },\n            {\n                \"attribute_code\": \"opt_in_sms\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"opt_in_email\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"topo_club_consent_prompted\",\n                \"value\": \"1\"\n            }\n        ]\n    },\n    \"password\": \"TestavimasAPI123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/customers",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login su variables",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Sėkmingas prisijungimas\", function () {",
+									"    var responseBody = pm.response.text();",
+									"    pm.expect(responseBody).to.not.be.empty;",
+									"});",
+									"let responseBody = pm.response.text();",
+									"let cleanedToken = responseBody.replace(/^\"|\"$/g, '');",
+									"pm.collectionVariables.set(\"authorization\", cleanedToken);",
+									"console.log(\"Išsaugotas token'as:\", cleanedToken);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"{{emailas}}\",\n    \"password\": \"{{passwordas}}\",\n    \"recaptchaToken\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/integration/customer/token",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"integration",
+								"customer",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "profile info su variables",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/customers/me",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"customers",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "profile info su variables",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customer\": {\n        \"email\": \"{{emailas}}\",\n        \"firstname\": \"Vardelis\",\n        \"lastname\": \"Pavardėlė\",\n        \"dob\": \"\",\n        \"website_id\": 1,\n        \"group_id\": 1,\n        \"custom_attributes\": [\n            {\n                \"attribute_code\": \"sforce_disable_sync\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"opt_in_email\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"opt_in_sms\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"opt_in_profiling\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"topo_club_customer_agreement\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"topo_club_consent_prompted\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"prohibit_custom_proposal_price\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"opt_in_email_changed_at\",\n                \"value\": \"2025-06-10 15:16:56\"\n            },\n            {\n                \"attribute_code\": \"opt_in_sms_changed_at\",\n                \"value\": \"2025-06-10 15:16:56\"\n            },\n            {\n                \"attribute_code\": \"opt_in_profiling_changed_at\",\n                \"value\": \"2025-06-10 15:16:56\"\n            },\n            {\n                \"attribute_code\": \"topo_club_customer_changed_at\",\n                \"value\": \"2025-06-10 15:16:56\"\n            },\n            {\n                \"attribute_code\": \"role\",\n                \"value\": \"client\"\n            },\n            {\n                \"attribute_code\": \"telephone\",\n                \"value\": \"\"\n            }\n        ]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/customers/me",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"customers",
+								"me"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Trečia užduotis",
+			"item": [
+				{
+					"name": "auto",
+					"item": [
+						{
+							"name": "auto login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"pm.test(\"Sėkmingas prisijungimas\", function () {",
+											"    var responseBody = pm.response.text();",
+											"    pm.expect(responseBody).to.not.be.empty;",
+											"});",
+											"let responseBody = pm.response.text();",
+											"let cleanedToken = responseBody.replace(/^\"|\"$/g, '');",
+											"pm.collectionVariables.set(\"authorization\", cleanedToken);",
+											"console.log(\"Išsaugotas token'as:\", cleanedToken);",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"{{emailas}}\",\n    \"password\": \"{{passwordas}}\",\n    \"recaptchaToken\": \"\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/rest/{{versija}}/integration/customer/token",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"rest",
+										"{{versija}}",
+										"integration",
+										"customer",
+										"token"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "auto add item to cart",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const targetSku = \"999906058519\"; // Replace with your target SKU",
+											"",
+											"let json;",
+											"try {",
+											"    json = pm.response.json();",
+											"    console.log(\"🛒 Full response:\", json);",
+											"} catch (e) {",
+											"    console.error(\"❌ Failed to parse JSON:\", e);",
+											"    return;",
+											"}",
+											"",
+											"let items = [];",
+											"",
+											"if (json.cart && Array.isArray(json.cart.items)) {",
+											"    items = json.cart.items;",
+											"} else {",
+											"    console.warn(\"⚠️ Could not locate cart.items array\");",
+											"}",
+											"",
+											"let foundItem = items.find(item => item.sku === targetSku);",
+											"",
+											"if (foundItem && foundItem.item_id) {",
+											"    pm.environment.set(\"cart_item_id\", foundItem.item_id);",
+											"    console.log(\"✅ Saved cart_item_id:\", foundItem.item_id);",
+											"",
+											"    pm.test(\"🆔 Item ID saved successfully\", function () {",
+											"        pm.expect(foundItem.item_id).to.be.a(\"number\");",
+											"    });",
+											"",
+											"} else {",
+											"    console.warn(\"⚠️ Could not find item with SKU:\", targetSku);",
+											"    pm.test(\"❌ Target SKU not found in cart\", function () {",
+											"        pm.expect(foundItem).to.not.be.null;",
+											"    });",
+											"}",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authorization}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"cartItem\": {\n        \"qty\": 1,\n        \"sku\": \"999906058519\",\n        \"name\": \"Televizorius XIAOMI 43\\\" A Pro 2025\",\n        \"quote_id\": \"49185253\"\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/rest/{{versija}}/carts/mine/items-full",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"rest",
+										"{{versija}}",
+										"carts",
+										"mine",
+										"items-full"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "auto my cart",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"// Parse the response body as JSON",
+											"let cartItems = pm.response.json();",
+											"",
+											"// Test: Ensure the cart is not empty",
+											"pm.test(\"Cart is not empty\", function () {",
+											"    pm.expect(cartItems.length).to.be.above(0);",
+											"});",
+											"",
+											"// Loop through items and show detailed info in test result names",
+											"cartItems.forEach(function(item, index) {",
+											"    const testTitle = `🛒 Item #${index + 1} → 🆔 ID: ${item.item_id} | 📦 Name: ${item.name} | 🔢 Qty: ${item.qty} | 💰 Price: ${item.price}`;",
+											"",
+											"    pm.test(testTitle, function () {",
+											"        pm.expect(item.name).to.be.a('string');",
+											"        pm.expect(item.item_id).to.be.a('number');",
+											"        pm.expect(item.qty).to.be.a('number');",
+											"        pm.expect(item.price).to.be.a('number');",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authorization}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/rest/{{versija}}/carts/mine/items",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"rest",
+										"{{versija}}",
+										"carts",
+										"mine",
+										"items"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "auto delete from cart",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authorization}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/rest/{{versija}}/carts/mine/items-full/sku/991273000059/itemId/{{cart_item_id}}",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"rest",
+										"{{versija}}",
+										"carts",
+										"mine",
+										"items-full",
+										"sku",
+										"991273000059",
+										"itemId",
+										"{{cart_item_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "<img src=\"https://content.pstmn.io/359cfd95-e11e-448f-a22a-05fee2f6d0c6/aW1hZ2UucG5n\" alt=\"\" height=\"302\" width=\"2886\">"
+				},
+				{
+					"name": "įstoti į Topo klubą",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customer\": {\n        \"email\": \"{{emailas}}\",\n        \"website_id\": 1,\n        \"extension_attributes\": {\n            \"topo_club_customer_agreement\": true\n        },\n        \"custom_attributes\": [\n            {\n                \"attribute_code\": \"opt_in_profiling\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"opt_in_sms\",\n                \"value\": \"1\"\n            },\n            {\n                \"attribute_code\": \"opt_in_email\",\n                \"value\": \"1\"\n            },\n            {\n                \"attribute_code\": \"topo_club_consent_prompted\",\n                \"value\": \"1\"\n            }\n        ]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/customers/me",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"customers",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "išstoti iš Topo klubo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customer\": {\n        \"email\": \"{{emailas}}\",\n        \"website_id\": 1,\n        \"extension_attributes\": {\n            \"topo_club_customer_agreement\": false\n        },\n        \"custom_attributes\": [\n            {\n                \"attribute_code\": \"opt_in_profiling\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"opt_in_sms\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"opt_in_email\",\n                \"value\": \"0\"\n            },\n            {\n                \"attribute_code\": \"topo_club_consent_prompted\",\n                \"value\": \"0\"\n            }\n        ]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/customers/me",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"customers",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pridėti prekę prie krepšelio",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const targetSku = \"999906058519\"; // Replace with your target SKU",
+									"",
+									"let json;",
+									"try {",
+									"    json = pm.response.json();",
+									"    console.log(\"🛒 Full response:\", json);",
+									"} catch (e) {",
+									"    console.error(\"❌ Failed to parse JSON:\", e);",
+									"    return;",
+									"}",
+									"",
+									"let items = [];",
+									"",
+									"if (json.cart && Array.isArray(json.cart.items)) {",
+									"    items = json.cart.items;",
+									"} else {",
+									"    console.warn(\"⚠️ Could not locate cart.items array\");",
+									"}",
+									"",
+									"let foundItem = items.find(item => item.sku === targetSku);",
+									"",
+									"if (foundItem && foundItem.item_id) {",
+									"    pm.environment.set(\"cart_item_id\", foundItem.item_id);",
+									"    console.log(\"✅ Saved cart_item_id:\", foundItem.item_id);",
+									"",
+									"    pm.test(\"🆔 Item ID saved successfully\", function () {",
+									"        pm.expect(foundItem.item_id).to.be.a(\"number\");",
+									"    });",
+									"",
+									"} else {",
+									"    console.warn(\"⚠️ Could not find item with SKU:\", targetSku);",
+									"    pm.test(\"❌ Target SKU not found in cart\", function () {",
+									"        pm.expect(foundItem).to.not.be.null;",
+									"    });",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cartItem\": {\n        \"qty\": 1,\n        \"sku\": \"999906058519\",\n        \"name\": \"Televizorius XIAOMI 43\\\" A Pro 2025\",\n        \"quote_id\": \"49185253\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/carts/mine/items-full",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"carts",
+								"mine",
+								"items-full"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ištrinti prekę iš krepšelio",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/carts/mine/items-full/sku/991273000059/itemId/{{cart_item_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"carts",
+								"mine",
+								"items-full",
+								"sku",
+								"991273000059",
+								"itemId",
+								"{{cart_item_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ketvirta užduotis",
+			"item": [
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Sėkmingas prisijungimas\", function () {",
+									"    var responseBody = pm.response.text();",
+									"    pm.expect(responseBody).to.not.be.empty;",
+									"});",
+									"let responseBody = pm.response.text();",
+									"let cleanedToken = responseBody.replace(/^\"|\"$/g, '');",
+									"pm.collectionVariables.set(\"authorization\", cleanedToken);",
+									"console.log(\"Išsaugotas token'as:\", cleanedToken);",
+									"pm.test(\"Response time is less than 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"{{emailas}}\",\n    \"password\": \"{{passwordas}}\",\n    \"recaptchaToken\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/integration/customer/token",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"integration",
+								"customer",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get item page",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const targetSku = \"999945000187\"; // 🔁 Replace with the desired SKU",
+									"",
+									"let json;",
+									"try {",
+									"    json = pm.response.json();",
+									"    console.log(\"🔍 Full response body:\", json);",
+									"} catch (e) {",
+									"    console.error(\"❌ Failed to parse JSON:\", e);",
+									"    return;",
+									"}",
+									"",
+									"// Navigate to the items array",
+									"let items = json?.data?.productDetail?.items || [];",
+									"",
+									"if (!Array.isArray(items)) {",
+									"    console.warn(\"⚠️ No items array found in response\");",
+									"    return;",
+									"}",
+									"",
+									"// Find the product with the target SKU",
+									"let targetProduct = items.find(item => item.sku === targetSku);",
+									"",
+									"if (targetProduct && targetProduct.id) {",
+									"    pm.environment.set(\"product_id\", targetProduct.id);",
+									"    console.log(\"✅ Saved product_id:\", targetProduct.id);",
+									"",
+									"    pm.test(\"🆔 Product ID saved\", function () {",
+									"        pm.expect(targetProduct.id).to.be.a(\"number\");",
+									"    });",
+									"} else {",
+									"    console.warn(\"❌ Product with SKU not found:\", targetSku);",
+									"    pm.test(\"❌ Product not found\", function () {",
+									"        pm.expect(targetProduct).to.not.be.undefined;",
+									"    });",
+									"}",
+									"// Extract SKU from response and save to environment",
+									"let jsonData = pm.response.json();",
+									"let sku = jsonData?.data?.productDetail?.items?.[0]?.sku;",
+									"",
+									"if (sku) {",
+									"    pm.environment.set(\"product_sku\", sku);",
+									"    console.log(\"✅ SKU saved:\", sku);",
+									"    pm.test(\"✅ SKU saved to environment\", function () {",
+									"        pm.expect(sku).to.be.a(\"string\");",
+									"    });",
+									"} else {",
+									"    console.warn(\"⚠️ SKU not found in response\");",
+									"    pm.test(\"❌ SKU not found in response\", function () {",
+									"        pm.expect(sku).to.not.be.undefined;",
+									"    });",
+									"}",
+									"pm.test(\"Response time is less than 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/graphql?query=ROOT_GetProduct&vars=%7B%22id%22%3A%22210098%22%7D",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"graphql"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "ROOT_GetProduct"
+								},
+								{
+									"key": "vars",
+									"value": "%7B%22id%22%3A%22210098%22%7D"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add item to wishlist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Response time is less than 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"mutation\": \"addItemToWishlist\",\n    \"vars\": {\n        \"productId\": {{product_id}}\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/graphql",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add item to cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const targetSku = \"999945000187\"; // Replace with your target SKU",
+									"",
+									"let json;",
+									"try {",
+									"    json = pm.response.json();",
+									"    console.log(\"🛒 Full response:\", json);",
+									"} catch (e) {",
+									"    console.error(\"❌ Failed to parse JSON:\", e);",
+									"    return;",
+									"}",
+									"",
+									"// Extract cart items",
+									"let cartItems = [];",
+									"",
+									"if (json.cart && Array.isArray(json.cart.items)) {",
+									"    cartItems = json.cart.items;",
+									"} else {",
+									"    console.warn(\"⚠️ Could not locate cart.items array\");",
+									"}",
+									"",
+									"// Find matching item by SKU",
+									"let foundItem = cartItems.find(item => item.sku === targetSku);",
+									"",
+									"// Save item_id and price if found",
+									"if (foundItem) {",
+									"    if (foundItem.item_id) {",
+									"        pm.environment.set(\"cart_item_id\", foundItem.item_id);",
+									"        console.log(\"✅ Saved cart_item_id:\", foundItem.item_id);",
+									"",
+									"        pm.test(\"🆔 Item ID saved successfully\", function () {",
+									"            pm.expect(foundItem.item_id).to.be.a(\"number\");",
+									"        });",
+									"    }",
+									"",
+									"    if (foundItem.price !== undefined && foundItem.price !== null) {",
+									"        pm.environment.set(\"product_price\", foundItem.price);",
+									"        console.log(\"💰 Product price saved:\", foundItem.price);",
+									"",
+									"        pm.test(\"💾 Product price saved successfully\", function () {",
+									"            const savedPrice = pm.environment.get(\"product_price\");",
+									"            pm.expect(savedPrice).to.not.be.null;",
+									"            pm.expect(parseFloat(savedPrice)).to.be.a(\"number\");",
+									"        });",
+									"    }",
+									"} else {",
+									"    console.warn(\"⚠️ Could not find item with SKU:\", targetSku);",
+									"    pm.test(\"❌ Target SKU not found in cart\", function () {",
+									"        pm.expect(!!foundItem).to.be.true;",
+									"    });",
+									"}",
+									"pm.test(\"Response time is less than 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cartItem\": {\n        \"qty\": 1,\n        \"sku\": \"999945000187\",\n        \"name\": \"SINGER Stitch Sew Quick Mini mechaniškas siuvimo mašina AA Baterija Balta\",\n        \"quote_id\": \"49185253\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/carts/mine/items-full",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"carts",
+								"mine",
+								"items-full"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5 unit quantity",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cartItem\": {\n    \"qty\": \"5\",\n    \"sku\": \"999945000187\",\n    \"name\": \"SINGER Stitch Sew Quick Mini mechaniškas siuvimo mašina AA Baterija Balta\",\n    \"quote_id\": \"49185253\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/carts/mine/items-full/sku",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"carts",
+								"mine",
+								"items-full",
+								"sku"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check cart - name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const expectedSku = pm.environment.get(\"product_sku\");",
+									"const expectedPrice = pm.environment.get(\"product_price\");",
+									"",
+									"pm.test(\"Body includes expected SKU\", function () {",
+									"    pm.expect(pm.response.text()).to.include(expectedSku);",
+									"});",
+									"",
+									"pm.test(\"Body includes expected price\", function () {",
+									"    pm.expect(pm.response.text()).to.include(expectedPrice);",
+									"});",
+									"pm.test(\"Response time is less than 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"input\": {\n        \"country_id\": \"LT\",\n        \"post_code\": null\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/carts/mine/full-cart",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"carts",
+								"mine",
+								"full-cart"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check cart - price",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const expectedSku = pm.environment.get(\"product_sku\");",
+									"const expectedPrice = pm.environment.get(\"product_price\");",
+									"",
+									"pm.test(\"Body includes expected SKU\", function () {",
+									"    pm.expect(pm.response.text()).to.include(expectedSku);",
+									"});",
+									"",
+									"pm.test(\"Body includes expected price\", function () {",
+									"    pm.expect(pm.response.text()).to.include(expectedPrice);",
+									"});",
+									"pm.test(\"Response time is less than 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"input\": {\n        \"country_id\": \"LT\",\n        \"post_code\": null\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/carts/mine/full-cart",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"carts",
+								"mine",
+								"full-cart"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "remove item from wishlist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Response time is less than 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"mutation\": \"removeItemFromWishlist\",\n    \"vars\": {\n        \"productId\": {{product_id}}\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/graphql",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete item from cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Response time is less than 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/carts/mine/items-full/sku/991273000059/itemId/{{cart_item_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"carts",
+								"mine",
+								"items-full",
+								"sku",
+								"991273000059",
+								"itemId",
+								"{{cart_item_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PVM",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let json;",
+									"",
+									"try {",
+									"    json = pm.response.json();",
+									"    console.log(\"🛒 Full response:\", json);",
+									"} catch (e) {",
+									"    console.error(\"❌ Failed to parse JSON:\", e);",
+									"    return;",
+									"}",
+									"",
+									"const items = json.totals?.items;",
+									"",
+									"if (Array.isArray(items) && items.length > 0) {",
+									"    const item = items[0]; // or use .find() to match SKU",
+									"",
+									"    const itemId = item.item_id;",
+									"    const price = item.price;",
+									"    const tax = item.tax_amount;",
+									"    const total = item.row_total_incl_tax;",
+									"",
+									"    const resultLine = `🆔 ID: ${itemId} | 💰 Price: ${price} | 🧾 Tax: ${tax} | 💵 Total (incl. tax): ${total}`;",
+									"    console.log(resultLine);",
+									"",
+									"    pm.test(resultLine, function () {",
+									"        pm.expect(itemId).to.be.a(\"number\");",
+									"        pm.expect(price).to.be.a(\"number\");",
+									"        pm.expect(tax).to.be.a(\"number\");",
+									"        pm.expect(total).to.be.a(\"number\");",
+									"    });",
+									"",
+									"} else {",
+									"    console.warn(\"⚠️ No items in totals\");",
+									"    pm.test(\"❌ No items found in totals.items\", function () {",
+									"        pm.expect(items).to.be.an(\"array\").that.is.not.empty;",
+									"    });",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authorization}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"input\": {\n        \"country_id\": \"LT\",\n        \"post_code\": null\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/rest/{{versija}}/carts/mine/full-cart",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"rest",
+								"{{versija}}",
+								"carts",
+								"mine",
+								"full-cart"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "https://www.topocentras.lt",
+			"type": "default"
+		},
+		{
+			"key": "versija",
+			"value": "V1",
+			"type": "default"
+		},
+		{
+			"key": "host",
+			"value": ""
+		},
+		{
+			"key": "authorization",
+			"value": ""
+		},
+		{
+			"key": "emailas",
+			"value": ""
+		},
+		{
+			"key": "passwordas",
+			"value": ""
+		}
+	]
+}
